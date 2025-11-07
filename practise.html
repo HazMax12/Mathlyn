@@ -1,1 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathlyn Practice</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #1e1e2f, #27293d); color: #f0f0f0; }
+  a { color: inherit; text-decoration: none; }
+
+  header {
+    position: fixed; top:0; left:0; width:100%; padding:1rem 2rem;
+    background: rgba(30,30,47,0.95); backdrop-filter: blur(10px);
+    display:flex; justify-content:space-between; align-items:center; z-index:1000;
+  }
+  header .logo { font-family:'Montserrat', sans-serif; font-weight:700; font-size:1.8rem; color:#ff6f61; }
+  nav a { margin-left:2rem; font-weight:500; position:relative; }
+  nav a::after { content:''; display:block; width:0; height:2px; background:#ff6f61; position:absolute; bottom:-4px; left:0; transition:0.3s; }
+  nav a:hover::after { width:100%; }
+
+  main { padding:8rem 2rem 4rem; max-width:800px; margin:0 auto; text-align:center; }
+
+  h1 { font-family:'Montserrat', sans-serif; font-size:2.8rem; margin-bottom:1rem; color:#ff6f61; }
+  p { font-size:1.1rem; margin-bottom:2rem; color:#ccc; }
+
+  .question-box { background: rgba(255,255,255,0.05); padding:2rem; border-radius:15px; margin-bottom:2rem; }
+  .question-box h2 { margin-bottom:1rem; }
+  input[type="number"] { padding:0.7rem; border-radius:8px; border:none; font-size:1rem; width:120px; margin-right:1rem; text-align:center; }
+  button { padding:0.7rem 1.5rem; background:#ff6f61; border:none; border-radius:50px; color:#fff; font-weight:600; cursor:pointer; transition:transform 0.3s, box-shadow 0.3s; }
+  button:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(255,111,97,0.4); }
+
+  .score { margin-top:1rem; font-size:1.1rem; }
+
+  footer { padding:2rem; text-align:center; background: rgba(30,30,47,0.9); margin-top:4rem; font-size:0.9rem; color:#888; }
+
+  /* Animations */
+  .fade-in { opacity:0; transform:translateY(30px); transition:all 0.6s ease-out; }
+  .fade-in.visible { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Mathlyn</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="practice.html">Practice</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Practice Your Math Skills</h1>
+  <p>Solve random math problems and track your score!</p>
+
+  <div class="question-box fade-in">
+    <h2 id="question">Loading question...</h2>
+    <input type="number" id="answer" placeholder="Answer">
+    <button id="submitBtn">Submit</button>
+    <div class="score" id="score">Score: 0 / 0</div>
+  </div>
+
+  <button id="newQuestionBtn">Next Question</button>
+</main>
+
+<footer>
+  &copy; 2025 Mathlyn.org | All rights reserved.
+</footer>
+
+<script>
+  // Scroll fade-in animation
+  const faders = document.querySelectorAll('.fade-in');
+  const appearOptions = { threshold: 0.2, rootMargin: "0px 0px -50px 0px" };
+  const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+    entries.forEach(entry => { if(entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+  }, appearOptions);
+  faders.forEach(fader => appearOnScroll.observe(fader));
+
+  // Math Practice Logic
+  let score = { correct: 0, total: 0 };
+  const questionEl = document.getElementById('question');
+  const answerEl = document.getElementById('answer');
+  const scoreEl = document.getElementById('score');
+  const submitBtn = document.getElementById('submitBtn');
+  const newQuestionBtn = document.getElementById('newQuestionBtn');
+
+  let currentAnswer;
+
+  function generateQuestion() {
+    const operations = ['+', '-', '*', '/'];
+    const op = operations[Math.floor(Math.random()*operations.length)];
+    let a = Math.floor(Math.random()*50)+1;
+    let b = Math.floor(Math.random()*50)+1;
+
+    // Avoid division by zero & force integer division
+    if(op === '/') { b = Math.floor(Math.random()*12)+1; a = b * Math.floor(Math.random()*12+1); }
+
+    currentAnswer = eval(`${a} ${op} ${b}`);
+    if(op === '/') currentAnswer = Math.floor(currentAnswer);
+
+    questionEl.textContent = `What is ${a} ${op} ${b}?`;
+    answerEl.value = '';
+    answerEl.focus();
+  }
+
+  submitBtn.addEventListener('click', () => {
+    const userAnswer = Number(answerEl.value);
+    if(userAnswer === currentAnswer) { score.correct++; alert('✅ Correct!'); }
+    else alert(`❌ Wrong! The answer was ${currentAnswer}`);
+    score.total++;
+    scoreEl.textContent = `Score: ${score.correct} / ${score.total}`;
+  });
+
+  newQuestionBtn.addEventListener('click', generateQuestion);
+
+  // Initialize first question
+  generateQuestion();
+</script>
+
+</body>
+</html>
 
